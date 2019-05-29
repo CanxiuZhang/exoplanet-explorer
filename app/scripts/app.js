@@ -19,11 +19,11 @@ Instructions:
    * @param {String} response - The unparsed JSON response from get.
    */
   function addSearchHeader(response) {
-    try {
-      response = JSON.parse(response).query;  // you'll be moving this line out of here in the next quiz!
-    } catch (e) {
-      // it's 'unknown', so leave it alone
-    }
+    // try {
+    //   response = JSON.parse(response).query;  // you'll be moving this line out of here in the next quiz!
+    // } catch (e) {
+    //   // it's 'unknown', so leave it alone
+    // }
     home.innerHTML = '<h2 class="page-title">query: ' + response + '</h2>';
   }
 
@@ -37,26 +37,37 @@ Instructions:
     /*
     This code needs to get wrapped in a Promise!
      */
-    return new Promise(function(resolve, reject){
-      var req = new XMLHttpRequest();
-      req.open('GET', url);
-      req.onload = function() {
-        if (req.status === 200) {
-          // It worked!
-          // You'll want to resolve with the data from req.response
-          resolve(req.response);
-        } else {
-          // It failed :(
-          // Be nice and reject with req.statusText
-          reject(Error(req.statusText));
-        }
-      };
-      req.onerror = function() {
-        // It failed :(
-        // Pass a 'Network Error' to reject
-        reject(Error('Network Error'));
-      };
-      req.send();
+    // return new Promise(function(resolve, reject){
+    //   var req = new XMLHttpRequest();
+    //   req.open('GET', url);
+    //   req.onload = function() {
+    //     if (req.status === 200) {
+    //       // It worked!
+    //       // You'll want to resolve with the data from req.response
+    //       resolve(req.response);
+    //     } else {
+    //       // It failed :(
+    //       // Be nice and reject with req.statusText
+    //       reject(Error(req.statusText));
+    //     }
+    //   };
+    //   req.onerror = function() {
+    //     // It failed :(
+    //     // Pass a 'Network Error' to reject
+    //     reject(Error('Network Error'));
+    //   };
+    //   req.send();
+    // });
+
+    // rewrite get with fetch API
+    return fetch(url, {
+      method: 'get'
+    });
+  }
+
+  function getJSON(url){
+    return get(url).then(function(response){
+      return response.json();
     });
   }
 
@@ -67,11 +78,27 @@ Instructions:
     You'll need to add a .then and a .catch. Pass the response to addSearchHeader on resolve or
     pass 'unknown' to addSearchHeader if it rejects.
      */
-    get('../data/earth-like-results.json').then(function(response){
-      addSearchHeader(response);
-    }, function(error){
+    // get('../data/earth-like-results.json').then(function(response){
+    //   addSearchHeader(response);
+    // }, function(error){
+    //   addSearchHeader('unknown');
+    //   console.log(error);
+    // });
+
+    // test
+    getJSON('../data/earth-like-results.json')
+    .then(function(response){
+      addSearchHeader(response.query);
+      console.log(response);
+      return response.results[0];
+    })
+    .then(function(url){
+      console.log(url)
+    })
+    .catch(function(error){
       addSearchHeader('unknown');
       console.log(error);
     });
   });
+
 })(document);
